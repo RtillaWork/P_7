@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  city: MyString
+  state: MyString
+  latitude: 1.5
+  longitude: 1.5
+  date: 2019-07-27 04:07:55
+  category: MyString
+  numberOfParticipants: 1
+  description: MyText
+
+two:
+  name: MyString
+  city: MyString
+  state: MyString
+  latitude: 1.5
+  longitude: 1.5
+  date: 2019-07-27 04:07:55
+  category: MyString
+  numberOfParticipants: 1
+  description: MyText

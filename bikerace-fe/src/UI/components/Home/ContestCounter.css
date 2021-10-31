@@ -1,0 +1,13 @@
+/* https://unsplash.com/photos/SJWPKMb9u-k */
+.bg-cool {
+  background-image: url(https://images.unsplash.com/photo-1452573992436-6d508f200b30?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80);
+  background-size: cover;
+}
+
+.bg-gr  {
+  background: linear-gradient(135deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 6%, rgba(0,0,0,0) 100%);
+}
+
+body {
+  background-color: #cb9d59;
+}

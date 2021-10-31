@@ -1,0 +1,95 @@
+// @import '../../node_modules/bootstrap/scss/bootstrap.scss';
+
+
+/* Coolors Exported Palette - coolors.co/f4f7be-e5f77d-deba6f-823038-1e000e */
+
+/* HSL */
+// $color1: hsla(63%, 78%, 86%, 1);
+// $color2: hsla(69%, 88%, 73%, 1);
+// $color3: hsla(41%, 63%, 65%, 1);
+// $color4: hsla(354%, 46%, 35%, 1);
+// $color5: hsla(332%, 100%, 6%, 1);
+
+/* RGB */
+// $color1: rgba(244, 247, 190, 1);
+// $color2: rgba(229, 247, 125, 1);
+// $color3: rgba(222, 186, 111, 1);
+// $color4: rgba(130, 48, 56, 1);
+// $color5: rgba(30, 0, 14, 1);
+
+$font-family-sans-serif: "Montserrat", "Blinker", "PT Sans", -apple-system, Blinker, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+// $font-family-sans-serif: "Saira Stencil One", Ubuntu, -apple-system, Blinker, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+$blue: #007bff;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #dc3545;
+$orange: #fd7e14;
+$yellow: #CFB87C;
+$green: #28a745;
+$teal: #20c997;
+$cyan: #17a2b8;
+$white: #fff;
+// $white: #333;
+// $white: #1E000E;
+
+$gray: #6c757d;
+$gray-dark: #343a40;
+$primary: #CFB87C;
+// $primary: #1E000E;
+$secondary: #e83e8c;
+$success: #28a745;
+$info: #6610f2;
+$warning: #fd7e14;
+$danger: #dc3545;
+$light: #A2A4A3;
+$dark: #565A5C;
+$breakpoint-xs: 0;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+
+// $font-family-sans-serif: "Montserrat", "Blinker", "PT Sans", -apple-system, Blinker, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+// $gray-900: #565A5C;
+// $gray-100: #A2A4A3;
+// $yellow: #CFB87C;
+// $body-bg: $gray-900;
+// $primary: $yellow;
+// $secondary: $pink;
+// $info: $indigo;
+// $warning: $orange;
+// $dark: $gray-900;
+// $body-color: $white;
+// $enable-rounded: false;
+
+// $gray-900: #565A5C;
+// $gray-100: #A2A4A3;
+// $yellow: #CFB87C;
+// $body-bg: $yellow;
+// $primary: $gray-900;
+// $secondary: $pink;
+// $info: $indigo;
+// $warning: $orange;
+// $dark: $gray-900;
+// $body-color: $white;
+// $enable-rounded: false;
+
+// $gray-900: #1E000E;
+$gray-900: #565A5C;
+$gray-100: #F4F7BE;
+$yellow: #CFB87C;
+$body-bg: #DEBA6F;
+// $primary: $gray-900;
+$primary: $pink;
+$secondary: #823038;
+$info: $indigo;
+$warning: $orange;
+$dark: $gray-900;
+$body-color: $white;
+$enable-rounded: false;
+
+ @import '~bootstrap/scss/bootstrap.scss';
+ 

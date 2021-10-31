@@ -1,0 +1,804 @@
+/*!
+	Colorbox 1.6.4
+	license: MIT
+	http://www.jacklmoore.com/colorbox
+*/
+(function($,document,window){var
+defaults={html:!1,photo:!1,iframe:!1,inline:!1,transition:"elastic",speed:300,fadeOut:300,width:!1,initialWidth:"600",innerWidth:!1,maxWidth:!1,height:!1,initialHeight:"450",innerHeight:!1,maxHeight:!1,scalePhotos:!0,scrolling:!0,opacity:0.9,preloading:!0,className:!1,overlayClose:!0,escKey:!0,arrowKey:!0,top:!1,bottom:!1,left:!1,right:!1,fixed:!1,data:undefined,closeButton:!0,fastIframe:!0,open:!1,reposition:!0,loop:!0,slideshow:!1,slideshowAuto:!0,slideshowSpeed:2500,slideshowStart:"start slideshow",slideshowStop:"stop slideshow",photoRegex:/\.(gif|png|jp(e|g|eg)|bmp|ico|webp|jxr|svg)((#|\?).*)?$/i,retinaImage:!1,retinaUrl:!1,retinaSuffix:'@2x.$1',current:"image {current} of {total}",previous:"previous",next:"next",close:"close",xhrError:"This content failed to load.",imgError:"This image failed to load.",returnFocus:!0,trapFocus:!0,onOpen:!1,onLoad:!1,onComplete:!1,onCleanup:!1,onClosed:!1,rel:function(){return this.rel},href:function(){return $(this).attr('href')},title:function(){return this.title},createImg:function(){var img=new Image();var attrs=$(this).data('cbox-img-attrs');if(typeof attrs==='object'){$.each(attrs,function(key,val){img[key]=val})}
+return img},createIframe:function(){var iframe=document.createElement('iframe');var attrs=$(this).data('cbox-iframe-attrs');if(typeof attrs==='object'){$.each(attrs,function(key,val){iframe[key]=val})}
+if('frameBorder' in iframe){iframe.frameBorder=0}
+if('allowTransparency' in iframe){iframe.allowTransparency="true"}
+iframe.name=(new Date()).getTime();iframe.allowFullscreen=!0;return iframe}},colorbox='colorbox',prefix='cbox',boxElement=prefix+'Element',event_open=prefix+'_open',event_load=prefix+'_load',event_complete=prefix+'_complete',event_cleanup=prefix+'_cleanup',event_closed=prefix+'_closed',event_purge=prefix+'_purge',$overlay,$box,$wrap,$content,$topBorder,$leftBorder,$rightBorder,$bottomBorder,$related,$window,$loaded,$loadingBay,$loadingOverlay,$title,$current,$slideshow,$next,$prev,$close,$groupControls,$events=$('<a/>'),settings,interfaceHeight,interfaceWidth,loadedHeight,loadedWidth,index,photo,open,active,closing,loadingTimer,publicMethod,div="div",requests=0,previousCSS={},init;function $tag(tag,id,css){var element=document.createElement(tag);if(id){element.id=prefix+id}
+if(css){element.style.cssText=css}
+return $(element)}
+function winheight(){return window.innerHeight?window.innerHeight:$(window).height()}
+function Settings(element,options){if(options!==Object(options)){options={}}
+this.cache={};this.el=element;this.value=function(key){var dataAttr;if(this.cache[key]===undefined){dataAttr=$(this.el).attr('data-cbox-'+key);if(dataAttr!==undefined){this.cache[key]=dataAttr}else if(options[key]!==undefined){this.cache[key]=options[key]}else if(defaults[key]!==undefined){this.cache[key]=defaults[key]}}
+return this.cache[key]};this.get=function(key){var value=this.value(key);return $.isFunction(value)?value.call(this.el,this):value}}
+function getIndex(increment){var
+max=$related.length,newIndex=(index+increment)%max;return(newIndex<0)?max+newIndex:newIndex}
+function setSize(size,dimension){return Math.round((/%/.test(size)?((dimension==='x'?$window.width():winheight())/100):1)*parseInt(size,10))}
+function isImage(settings,url){return settings.get('photo')||settings.get('photoRegex').test(url)}
+function retinaUrl(settings,url){return settings.get('retinaUrl')&&window.devicePixelRatio>1?url.replace(settings.get('photoRegex'),settings.get('retinaSuffix')):url}
+function trapFocus(e){if('contains' in $box[0]&&!$box[0].contains(e.target)&&e.target!==$overlay[0]){e.stopPropagation();$box.focus()}}
+function setClass(str){if(setClass.str!==str){$box.add($overlay).removeClass(setClass.str).addClass(str);setClass.str=str}}
+function getRelated(rel){index=0;if(rel&&rel!==!1&&rel!=='nofollow'){$related=$('.'+boxElement).filter(function(){var options=$.data(this,colorbox);var settings=new Settings(this,options);return(settings.get('rel')===rel)});index=$related.index(settings.el);if(index===-1){$related=$related.add(settings.el);index=$related.length-1}}else{$related=$(settings.el)}}
+function trigger(event){$(document).trigger(event);$events.triggerHandler(event)}
+var slideshow=(function(){var active,className=prefix+"Slideshow_",click="click."+prefix,timeOut;function clear(){clearTimeout(timeOut)}
+function set(){if(settings.get('loop')||$related[index+1]){clear();timeOut=setTimeout(publicMethod.next,settings.get('slideshowSpeed'))}}
+function start(){$slideshow.html(settings.get('slideshowStop')).unbind(click).one(click,stop);$events.bind(event_complete,set).bind(event_load,clear);$box.removeClass(className+"off").addClass(className+"on")}
+function stop(){clear();$events.unbind(event_complete,set).unbind(event_load,clear);$slideshow.html(settings.get('slideshowStart')).unbind(click).one(click,function(){publicMethod.next();start()});$box.removeClass(className+"on").addClass(className+"off")}
+function reset(){active=!1;$slideshow.hide();clear();$events.unbind(event_complete,set).unbind(event_load,clear);$box.removeClass(className+"off "+className+"on")}
+return function(){if(active){if(!settings.get('slideshow')){$events.unbind(event_cleanup,reset);reset()}}else{if(settings.get('slideshow')&&$related[1]){active=!0;$events.one(event_cleanup,reset);if(settings.get('slideshowAuto')){start()}else{stop()}
+$slideshow.show()}}}}());function launch(element){var options;if(!closing){options=$(element).data(colorbox);settings=new Settings(element,options);getRelated(settings.get('rel'));if(!open){open=active=!0;setClass(settings.get('className'));$box.css({visibility:'hidden',display:'block',opacity:''});$loaded=$tag(div,'LoadedContent','width:0; height:0; overflow:hidden; visibility:hidden');$content.css({width:'',height:''}).append($loaded);interfaceHeight=$topBorder.height()+$bottomBorder.height()+$content.outerHeight(!0)-$content.height();interfaceWidth=$leftBorder.width()+$rightBorder.width()+$content.outerWidth(!0)-$content.width();loadedHeight=$loaded.outerHeight(!0);loadedWidth=$loaded.outerWidth(!0);var initialWidth=setSize(settings.get('initialWidth'),'x');var initialHeight=setSize(settings.get('initialHeight'),'y');var maxWidth=settings.get('maxWidth');var maxHeight=settings.get('maxHeight');settings.w=Math.max((maxWidth!==!1?Math.min(initialWidth,setSize(maxWidth,'x')):initialWidth)-loadedWidth-interfaceWidth,0);settings.h=Math.max((maxHeight!==!1?Math.min(initialHeight,setSize(maxHeight,'y')):initialHeight)-loadedHeight-interfaceHeight,0);$loaded.css({width:'',height:settings.h});publicMethod.position();trigger(event_open);settings.get('onOpen');$groupControls.add($title).hide();$box.focus();if(settings.get('trapFocus')){if(document.addEventListener){document.addEventListener('focus',trapFocus,!0);$events.one(event_closed,function(){document.removeEventListener('focus',trapFocus,!0)})}}
+if(settings.get('returnFocus')){$events.one(event_closed,function(){$(settings.el).focus()})}}
+var opacity=parseFloat(settings.get('opacity'));$overlay.css({opacity:opacity===opacity?opacity:'',cursor:settings.get('overlayClose')?'pointer':'',visibility:'visible'}).show();if(settings.get('closeButton')){$close.html(settings.get('close')).appendTo($content)}else{$close.appendTo('<div/>')}
+load()}}
+function appendHTML(){if(!$box){init=!1;$window=$(window);$box=$tag(div).attr({id:colorbox,'class':$.support.opacity===!1?prefix+'IE':'',role:'dialog',tabindex:'-1'}).hide();$overlay=$tag(div,"Overlay").hide();$loadingOverlay=$([$tag(div,"LoadingOverlay")[0],$tag(div,"LoadingGraphic")[0]]);$wrap=$tag(div,"Wrapper");$content=$tag(div,"Content").append($title=$tag(div,"Title"),$current=$tag(div,"Current"),$prev=$('<button type="button"/>').attr({id:prefix+'Previous'}).text('Previous'),$next=$('<button type="button"/>').attr({id:prefix+'Next'}).text('Next'),$slideshow=$('<button type="button"/>').attr({id:prefix+'Slideshow'}).text('Slideshow'),$loadingOverlay);$close=$('<button type="button"/>').attr({id:prefix+'Close'});$wrap.append($tag(div).append($tag(div,"TopLeft"),$topBorder=$tag(div,"TopCenter"),$tag(div,"TopRight")),$tag(div,!1,'clear:left').append($leftBorder=$tag(div,"MiddleLeft"),$content,$rightBorder=$tag(div,"MiddleRight")),$tag(div,!1,'clear:left').append($tag(div,"BottomLeft"),$bottomBorder=$tag(div,"BottomCenter"),$tag(div,"BottomRight"))).find('div div').css({'float':'left'});$loadingBay=$tag(div,!1,'position:absolute; width:9999px; visibility:hidden; display:none; max-width:none;');$groupControls=$next.add($prev).add($current).add($slideshow)}
+if(document.body&&!$box.parent().length){$(document.body).append($overlay,$box.append($wrap,$loadingBay))}}
+function addBindings(){function clickHandler(e){if(!(e.which>1||e.shiftKey||e.altKey||e.metaKey||e.ctrlKey)){e.preventDefault();launch(this)}}
+if($box){if(!init){init=!0;$next.click(function(){publicMethod.next()});$prev.click(function(){publicMethod.prev()});$close.click(function(){publicMethod.close()});$overlay.click(function(){if(settings.get('overlayClose')){publicMethod.close()}});$(document).bind('keydown.'+prefix,function(e){var key=e.keyCode;if(open&&settings.get('escKey')&&key===27){e.preventDefault();publicMethod.close()}
+if(open&&settings.get('arrowKey')&&$related[1]&&!e.altKey){if(key===37){e.preventDefault();$prev.click()}else if(key===39){e.preventDefault();$next.click()}}});if($.isFunction($.fn.on)){$(document).on('click.'+prefix,'.'+boxElement,clickHandler)}else{$('.'+boxElement).live('click.'+prefix,clickHandler)}}
+return!0}
+return!1}
+if($[colorbox]){return}
+$(appendHTML);publicMethod=$.fn[colorbox]=$[colorbox]=function(options,callback){var settings;var $obj=this;options=options||{};if($.isFunction($obj)){$obj=$('<a/>');options.open=!0}
+if(!$obj[0]){return $obj}
+appendHTML();if(addBindings()){if(callback){options.onComplete=callback}
+$obj.each(function(){var old=$.data(this,colorbox)||{};$.data(this,colorbox,$.extend(old,options))}).addClass(boxElement);settings=new Settings($obj[0],options);if(settings.get('open')){launch($obj[0])}}
+return $obj};publicMethod.position=function(speed,loadedCallback){var
+css,top=0,left=0,offset=$box.offset(),scrollTop,scrollLeft;$window.unbind('resize.'+prefix);$box.css({top:-9e4,left:-9e4});scrollTop=$window.scrollTop();scrollLeft=$window.scrollLeft();if(settings.get('fixed')){offset.top-=scrollTop;offset.left-=scrollLeft;$box.css({position:'fixed'})}else{top=scrollTop;left=scrollLeft;$box.css({position:'absolute'})}
+if(settings.get('right')!==!1){left+=Math.max($window.width()-settings.w-loadedWidth-interfaceWidth-setSize(settings.get('right'),'x'),0)}else if(settings.get('left')!==!1){left+=setSize(settings.get('left'),'x')}else{left+=Math.round(Math.max($window.width()-settings.w-loadedWidth-interfaceWidth,0)/2)}
+if(settings.get('bottom')!==!1){top+=Math.max(winheight()-settings.h-loadedHeight-interfaceHeight-setSize(settings.get('bottom'),'y'),0)}else if(settings.get('top')!==!1){top+=setSize(settings.get('top'),'y')}else{top+=Math.round(Math.max(winheight()-settings.h-loadedHeight-interfaceHeight,0)/2)}
+$box.css({top:offset.top,left:offset.left,visibility:'visible'});$wrap[0].style.width=$wrap[0].style.height="9999px";function modalDimensions(){$topBorder[0].style.width=$bottomBorder[0].style.width=$content[0].style.width=(parseInt($box[0].style.width,10)-interfaceWidth)+'px';$content[0].style.height=$leftBorder[0].style.height=$rightBorder[0].style.height=(parseInt($box[0].style.height,10)-interfaceHeight)+'px'}
+css={width:settings.w+loadedWidth+interfaceWidth,height:settings.h+loadedHeight+interfaceHeight,top:top,left:left};if(speed){var tempSpeed=0;$.each(css,function(i){if(css[i]!==previousCSS[i]){tempSpeed=speed;return}});speed=tempSpeed}
+previousCSS=css;if(!speed){$box.css(css)}
+$box.dequeue().animate(css,{duration:speed||0,complete:function(){modalDimensions();active=!1;$wrap[0].style.width=(settings.w+loadedWidth+interfaceWidth)+"px";$wrap[0].style.height=(settings.h+loadedHeight+interfaceHeight)+"px";if(settings.get('reposition')){setTimeout(function(){$window.bind('resize.'+prefix,publicMethod.position)},1)}
+if($.isFunction(loadedCallback)){loadedCallback()}},step:modalDimensions})};publicMethod.resize=function(options){var scrolltop;if(open){options=options||{};if(options.width){settings.w=setSize(options.width,'x')-loadedWidth-interfaceWidth}
+if(options.innerWidth){settings.w=setSize(options.innerWidth,'x')}
+$loaded.css({width:settings.w});if(options.height){settings.h=setSize(options.height,'y')-loadedHeight-interfaceHeight}
+if(options.innerHeight){settings.h=setSize(options.innerHeight,'y')}
+if(!options.innerHeight&&!options.height){scrolltop=$loaded.scrollTop();$loaded.css({height:"auto"});settings.h=$loaded.height()}
+$loaded.css({height:settings.h});if(scrolltop){$loaded.scrollTop(scrolltop)}
+publicMethod.position(settings.get('transition')==="none"?0:settings.get('speed'))}};publicMethod.prep=function(object){if(!open){return}
+var callback,speed=settings.get('transition')==="none"?0:settings.get('speed');$loaded.remove();$loaded=$tag(div,'LoadedContent').append(object);function getWidth(){settings.w=settings.w||$loaded.width();settings.w=settings.mw&&settings.mw<settings.w?settings.mw:settings.w;return settings.w}
+function getHeight(){settings.h=settings.h||$loaded.height();settings.h=settings.mh&&settings.mh<settings.h?settings.mh:settings.h;return settings.h}
+$loaded.hide().appendTo($loadingBay.show()).css({width:getWidth(),overflow:settings.get('scrolling')?'auto':'hidden'}).css({height:getHeight()}).prependTo($content);$loadingBay.hide();$(photo).css({'float':'none'});setClass(settings.get('className'));callback=function(){var total=$related.length,iframe,complete;if(!open){return}
+function removeFilter(){if($.support.opacity===!1){$box[0].style.removeAttribute('filter')}}
+complete=function(){clearTimeout(loadingTimer);$loadingOverlay.hide();trigger(event_complete);settings.get('onComplete')};$title.html(settings.get('title')).show();$loaded.show();if(total>1){if(typeof settings.get('current')==="string"){$current.html(settings.get('current').replace('{current}',index+1).replace('{total}',total)).show()}
+$next[(settings.get('loop')||index<total-1)?"show":"hide"]().html(settings.get('next'));$prev[(settings.get('loop')||index)?"show":"hide"]().html(settings.get('previous'));slideshow();if(settings.get('preloading')){$.each([getIndex(-1),getIndex(1)],function(){var img,i=$related[this],settings=new Settings(i,$.data(i,colorbox)),src=settings.get('href');if(src&&isImage(settings,src)){src=retinaUrl(settings,src);img=document.createElement('img');img.src=src}})}}else{$groupControls.hide()}
+if(settings.get('iframe')){iframe=settings.get('createIframe');if(!settings.get('scrolling')){iframe.scrolling="no"}
+$(iframe).attr({src:settings.get('href'),'class':prefix+'Iframe'}).one('load',complete).appendTo($loaded);$events.one(event_purge,function(){iframe.src="//about:blank"});if(settings.get('fastIframe')){$(iframe).trigger('load')}}else{complete()}
+if(settings.get('transition')==='fade'){$box.fadeTo(speed,1,removeFilter)}else{removeFilter()}};if(settings.get('transition')==='fade'){$box.fadeTo(speed,0,function(){publicMethod.position(0,callback)})}else{publicMethod.position(speed,callback)}};function load(){var href,setResize,prep=publicMethod.prep,$inline,request=++requests;active=!0;photo=!1;trigger(event_purge);trigger(event_load);settings.get('onLoad');settings.h=settings.get('height')?setSize(settings.get('height'),'y')-loadedHeight-interfaceHeight:settings.get('innerHeight')&&setSize(settings.get('innerHeight'),'y');settings.w=settings.get('width')?setSize(settings.get('width'),'x')-loadedWidth-interfaceWidth:settings.get('innerWidth')&&setSize(settings.get('innerWidth'),'x');settings.mw=settings.w;settings.mh=settings.h;if(settings.get('maxWidth')){settings.mw=setSize(settings.get('maxWidth'),'x')-loadedWidth-interfaceWidth;settings.mw=settings.w&&settings.w<settings.mw?settings.w:settings.mw}
+if(settings.get('maxHeight')){settings.mh=setSize(settings.get('maxHeight'),'y')-loadedHeight-interfaceHeight;settings.mh=settings.h&&settings.h<settings.mh?settings.h:settings.mh}
+href=settings.get('href');loadingTimer=setTimeout(function(){$loadingOverlay.show()},100);if(settings.get('inline')){var $target=$(href).eq(0);$inline=$('<div>').hide().insertBefore($target);$events.one(event_purge,function(){$inline.replaceWith($target)});prep($target)}else if(settings.get('iframe')){prep(" ")}else if(settings.get('html')){prep(settings.get('html'))}else if(isImage(settings,href)){href=retinaUrl(settings,href);photo=settings.get('createImg');$(photo).addClass(prefix+'Photo').bind('error.'+prefix,function(){prep($tag(div,'Error').html(settings.get('imgError')))}).one('load',function(){if(request!==requests){return}
+setTimeout(function(){var percent;if(settings.get('retinaImage')&&window.devicePixelRatio>1){photo.height=photo.height/window.devicePixelRatio;photo.width=photo.width/window.devicePixelRatio}
+if(settings.get('scalePhotos')){setResize=function(){photo.height-=photo.height*percent;photo.width-=photo.width*percent};if(settings.mw&&photo.width>settings.mw){percent=(photo.width-settings.mw)/photo.width;setResize()}
+if(settings.mh&&photo.height>settings.mh){percent=(photo.height-settings.mh)/photo.height;setResize()}}
+if(settings.h){photo.style.marginTop=Math.max(settings.mh-photo.height,0)/2+'px'}
+if($related[1]&&(settings.get('loop')||$related[index+1])){photo.style.cursor='pointer';$(photo).bind('click.'+prefix,function(){publicMethod.next()})}
+photo.style.width=photo.width+'px';photo.style.height=photo.height+'px';prep(photo)},1)});photo.src=href}else if(href){$loadingBay.load(href,settings.get('data'),function(data,status){if(request===requests){prep(status==='error'?$tag(div,'Error').html(settings.get('xhrError')):$(this).contents())}})}}
+publicMethod.next=function(){if(!active&&$related[1]&&(settings.get('loop')||$related[index+1])){index=getIndex(1);launch($related[index])}};publicMethod.prev=function(){if(!active&&$related[1]&&(settings.get('loop')||index)){index=getIndex(-1);launch($related[index])}};publicMethod.close=function(){if(open&&!closing){closing=!0;open=!1;trigger(event_cleanup);settings.get('onCleanup');$window.unbind('.'+prefix);$overlay.fadeTo(settings.get('fadeOut')||0,0);$box.stop().fadeTo(settings.get('fadeOut')||0,0,function(){$box.hide();$overlay.hide();trigger(event_purge);$loaded.remove();setTimeout(function(){closing=!1;trigger(event_closed);settings.get('onClosed')},1)})}};publicMethod.remove=function(){if(!$box){return}
+$box.stop();$[colorbox].close();$box.stop(!1,!0).remove();$overlay.remove();closing=!1;$box=null;$('.'+boxElement).removeData(colorbox).removeClass(boxElement);$(document).unbind('click.'+prefix).unbind('keydown.'+prefix)};publicMethod.element=function(){return $(settings.el)};publicMethod.settings=defaults}(jQuery,document,window))
+;
+/**
+ * @file
+ * Colorbox module init js.
+ */
+
+(function ($) {
+
+Drupal.behaviors.initColorbox = {
+  attach: function (context, settings) {
+    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
+      return;
+    }
+
+    if (settings.colorbox.mobiledetect && window.matchMedia) {
+      // Disable Colorbox for small screens.
+      var mq = window.matchMedia("(max-device-width: " + settings.colorbox.mobiledevicewidth + ")");
+      if (mq.matches) {
+        return;
+      }
+    }
+
+    // Use "data-colorbox-gallery" if set otherwise use "rel".
+    settings.colorbox.rel = function () {
+      if ($(this).data('colorbox-gallery')) {
+        return $(this).data('colorbox-gallery');
+      }
+      else {
+        return $(this).attr('rel');
+      }
+    };
+
+    $('.colorbox', context)
+      .once('init-colorbox')
+      .colorbox(settings.colorbox);
+
+    $(context).bind('cbox_complete', function () {
+      Drupal.attachBehaviors('#cboxLoadedContent');
+    });
+  }
+};
+
+})(jQuery);
+;
+/**
+ * @file
+ * Colorbox module style js.
+ */
+
+(function ($) {
+
+Drupal.behaviors.initColorboxStockholmsyndromeStyle = {
+  attach: function (context, settings) {
+    $(context).bind('cbox_open', function () {
+      // Hide close button initially.
+      $('#cboxClose', context).css('opacity', 0);
+    });
+    $(context).bind('cbox_load', function () {
+      // Hide close button. (It doesn't handle the load animation well.)
+      $('#cboxClose', context).css('opacity', 0);
+    });
+    $(context).bind('cbox_complete', function () {
+      // Show close button with a delay.
+      $('#cboxClose', context).fadeTo('fast', 0, function () {$(this).css('opacity', 1)});
+    });
+  }
+};
+
+})(jQuery);
+;
+(function ($) {
+
+  Drupal.behaviors.context_accordion = {
+    attach: function (context, settings) {
+      $('#edit-reactions-plugins-block-selector').accordion({ header: '.form-type-checkboxes > label', autoHeight: false});
+    }
+  };
+}(jQuery));
+
+
+;
+
+(function($) {
+
+/**
+ * Add behaviors to submit buttons with the 'files-undo-remove' class.
+ */
+Drupal.behaviors.filesUndoRemove = {
+  attach: function (context) {
+
+    // Check existing states.
+    $('.files-undo-remove-hidden-state').once().each(function() {
+      var $state = $(this);
+      if ($state.val() == 1) {
+        var $table_row = $state.parents('tr').first();
+        var $button = $table_row.find('.files-undo-remove');
+        Drupal.filesUndoRemoveSetState($state.val(0), $button, $table_row);
+      }
+    });
+
+    // Attach click behavior on the Remove buttons.
+    $('.files-undo-remove').once().click(function(e) {
+
+      // Do not submit.
+      e.preventDefault();
+
+      // Prepare button and row variable.
+      var $button = $(this);
+      var $table_row = $button.parents('tr').first();
+
+      // Get the current state.
+      var $state = $table_row.find('.files-undo-remove-hidden-state');
+
+      // Based on the state, change the button text and make the table row
+      // of this file look like it's disabled or enabled and change
+      // the state value.
+      Drupal.filesUndoRemoveSetState($state, $button, $table_row);
+    });
+  }
+};
+
+/**
+ * State function for a file row.
+ */
+Drupal.filesUndoRemoveSetState = function(state, button, table_row) {
+  if (state.val() == 1) {
+    state.val(0);
+    button.val(Drupal.t('Remove'));
+    table_row.removeClass('warning');
+    $('.files-undo-remove-message', table_row).remove();
+  }
+  else {
+    state.val(1);
+    table_row.addClass('warning');
+    button.val(Drupal.t('Undo'));
+    $('.file-size', table_row).append('<div class="files-undo-remove-message">'+ Drupal.t('This file will be removed when saving the form.') +'</div>');
+  }
+};
+
+})(jQuery);
+;
+/*
+ * jQuery Backstretch
+ * Version 1.2.5
+ * http://srobbin.com/jquery-plugins/jquery-backstretch/
+ *
+ * Add a dynamically-resized background image to the page
+ *
+ * Copyright (c) 2011 Scott Robbin (srobbin.com)
+ * Dual licensed under the MIT and GPL licenses.
+*/
+
+(function($) {
+
+    $.backstretch = function(src, options, callback) {
+        var defaultSettings = {
+            centeredX: true,         // Should we center the image on the X axis?
+            centeredY: true,         // Should we center the image on the Y axis?
+            speed: 0                 // fadeIn speed for background after image loads (e.g. "fast" or 500)
+        },
+        container = $("#backstretch"),
+        settings = container.data("settings") || defaultSettings, // If this has been called once before, use the old settings as the default
+        existingSettings = container.data('settings'),
+        rootElement = ("onorientationchange" in window) ? $(document) : $(window), // hack to acccount for iOS position:fixed shortcomings
+        imgRatio, bgImg, bgWidth, bgHeight, bgOffset, bgCSS;
+                
+        // Extend the settings with those the user has provided
+        if(options && typeof options == "object") $.extend(settings, options);
+        
+        // Just in case the user passed in a function without options
+        if(options && typeof options == "function") callback = options;
+    
+        // Initialize
+        $(document).ready(_init);
+  
+        // For chaining
+        return this;
+    
+        function _init() {
+            // Prepend image, wrapped in a DIV, with some positioning and zIndex voodoo
+            if(src) {
+                var img;
+                
+                // If this is the first time that backstretch is being called
+                if(container.length == 0) {
+                    container = $("<div />").attr("id", "backstretch")
+                                            .css({left: 0, top: 0, position: "fixed", overflow: "hidden", zIndex: -999999, margin: 0, padding: 0, height: "100%", width: "100%"});
+                } else {
+                    // Prepare to delete any old images
+                    container.find("img").addClass("deleteable");
+                }
+                
+                img = $("<img />").css({position: "absolute", display: "none", margin: 0, padding: 0, border: "none", zIndex: -999999})
+                                  .bind("load", function(e) {                                          
+                                      var self = $(this),
+                                          imgWidth, imgHeight;
+                                          
+                                      self.css({width: "auto", height: "auto"});
+                                      imgWidth = this.width || $(e.target).width();
+                                      imgHeight = this.height || $(e.target).height();
+                                      imgRatio = imgWidth / imgHeight;
+
+                                      _adjustBG(function() {
+                                          self.fadeIn(settings.speed, function(){
+                                              // Remove the old images, if necessary.
+                                              container.find('.deleteable').remove();
+                                              // Callback
+                                              if(typeof callback == "function") callback();
+                                          });
+                                      });
+                                      
+                                  })
+                                  .appendTo(container);
+                 
+                // Append the container to the body, if it's not already there
+                if($("body #backstretch").length == 0) {
+                    $("body").append(container);
+                }
+                
+                // Attach the settings
+                container.data("settings", settings);
+                    
+                img.attr("src", src); // Hack for IE img onload event
+                // Adjust the background size when the window is resized or orientation has changed (iOS)
+                $(window).resize(_adjustBG);
+            }
+        }
+            
+        function _adjustBG(fn) {
+            try {
+                bgCSS = {left: 0, top: 0}
+                bgWidth = rootElement.width();
+                bgHeight = bgWidth / imgRatio;
+                
+                // Make adjustments based on image ratio
+                // Note: Offset code provided by Peter Baker (http://ptrbkr.com/). Thanks, Peter!
+                if(bgHeight >= rootElement.height()) {
+                    bgOffset = (bgHeight - rootElement.height()) /2;
+                    if(settings.centeredY) $.extend(bgCSS, {top: "-" + bgOffset + "px"});
+                } else {
+                    bgHeight = rootElement.height();
+                    bgWidth = bgHeight * imgRatio;
+                    bgOffset = (bgWidth - rootElement.width()) / 2;
+                    if(settings.centeredX) $.extend(bgCSS, {left: "-" + bgOffset + "px"});
+                }
+
+                $("#backstretch, #backstretch img:not(.deleteable)").width( bgWidth ).height( bgHeight )
+                                                   .filter("img").css(bgCSS);
+            } catch(err) {
+                // IE7 seems to trigger _adjustBG before the image is loaded.
+                // This try/catch block is a hack to let it fail gracefully.
+            }
+      
+            // Executed the passed in function, if necessary
+            if (typeof fn == "function") fn();
+        }
+    };
+  
+})(jQuery);
+;
+(function($) {
+
+  $(document).ready(
+    function alertWorker() {
+      // @TODO: Add loop count or option to exit so this doesn't keep running after an 
+      // active event has ended if someone leaves a browser open
+      if ( Drupal.settings.rave_alerts_active_event == 1 ) {
+				// Create our own rounded timestamp to limit paths cached by varnish
+				var stamp = Math.ceil( $.now() / 10000 );
+				//console.log(stamp);
+
+				$.ajax({
+					type: "GET",
+					url: Drupal.settings.rave_alerts_rss_url + "?stamp=" + stamp,
+					dataType: "xml",
+					//cache: false, // Causes Varnish to miss every request
+					success: rssParser,
+					complete: function() {
+						// Schedule the next request when the current one's complete
+						setTimeout(alertWorker, 10000);
+					}
+				});
+			};
+    });
+
+    function rssParser(xml) {
+      $(xml).find("item").each(function () {
+        if ($(this).find("link").text()) {
+          feedLink = $(this).find("link").text();
+        } else {
+          // @TODO: get url from jQuery.extend(Drupal.settings
+          feedLink = Drupal.settings.rave_alerts_deafult_read_more_url;
+        }
+        var stamp = Math.ceil( $.now() / 10000 );
+        var alertTitle = $(this).find("description").text();
+        var alertPubtime = $(this).find("pubDate").text();
+        $("#rave-alerts .alert").html(alertTitle + ' <a href="' + feedLink + '" >' + 'Read More</a>');
+        // data-alert-publish-time="' + alertPubtime + '" data-alert-timestamp="' + stamp + '"
+        $("#rave-alerts .alert").attr('data-alert-publish-time', alertPubtime);
+        $("#rave-alerts .alert").attr('data-alert-timestamp', stamp);
+      });
+    };
+
+})(jQuery);
+;
+(function( $ ){
+
+
+function parallax_browser_check() {
+  if (navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)) {
+    return false;
+  }
+  return true;
+}
+
+$(document).ready(function(){
+  if (parallax_browser_check()) {
+    $('.parallax-window').parallaxie();
+  }
+});
+
+
+}( jQuery ));
+;
+/*! Copyright (c) 2016 THE ULTRASOFT (http://theultrasoft.com)
+ * Licensed under the MIT License (LICENSE.txt).
+ *
+ * Project: Parallaxie
+ * Version: 0.5
+ *
+ * Requires: jQuery 1.9+
+ */
+
+(function( $ ){
+
+    $.fn.parallaxie = function( options ){
+
+        var options = $.extend({
+            speed: 0.2,
+            repeat: 'no-repeat',
+            size: 'cover',
+            pos_x: 'center',
+            offset: 0,
+        }, options );
+
+        this.each(function(){
+
+            var $el = $(this);
+            var local_options = $el.data('parallaxie');
+            if( typeof local_options != 'object' ) local_options = {};
+            local_options = $.extend( {}, options, local_options );
+
+            var image_url = $el.data('image');
+            if( typeof image_url == 'undefined' ){
+                image_url = $el.css('background-image');
+                if( !image_url ) return;
+
+                // APPLY DEFAULT CSS
+                var pos_y =  local_options.offset + ($el.offset().top - $(window).scrollTop()) * (1 - local_options.speed );
+                $el.css({
+                    'background-image': image_url,
+                    'background-size': local_options.size,
+                    'background-repeat': local_options.repeat,
+                    'background-attachment': 'fixed',
+                    'background-position': local_options.pos_x + ' ' + pos_y + 'px',
+                });
+
+                $(window).scroll( function(){
+                        //var pos_y = - ( $(window).scrollTop() - $el.offset().top ) * ( 1 + local_options.speed ) - ( $el.offset().top * local_options.speed );
+                        var pos_y =  local_options.offset + ($el.offset().top - $(window).scrollTop()) * (1 - local_options.speed );
+                        $el.data( 'pos_y', pos_y );
+                        $el.css( 'background-position', local_options.pos_x + ' ' + pos_y + 'px' );
+                    }
+                );
+            }
+        });
+        return this;
+    };
+}( jQuery ));;
+(function( $ ){
+  $(document).ready(function(){
+    $(".expand-content").hide();
+    $("a.expand-title span").addClass("expand");
+    $("a.expand-title").toggle(function(){
+      var t = $(this).attr("href");
+      $(t).slideToggle("fast");
+      $("span", this).removeClass("expand");
+      $("span", this).addClass("collapse");
+      $(this).addClass("expand-active");
+      $(this).attr('aria-expanded', 'true');
+      return false;
+    }, function() {
+      var t = $(this).attr("href");
+      $(t).slideToggle("fast");
+      $("span", this).removeClass("collapse");
+      $("span", this).addClass("expand");
+      $(this).removeClass("expand-active");
+      $(this).attr('aria-expanded', 'false');
+      return false;
+    });
+
+    $(".small-expand-content, .tooltip-expand-content").hide();
+    $("a.small-expand-title").toggle(function(){
+      var t = $(this).attr("href");
+      $(t).slideToggle("fast");
+      $("i.fa", this).removeClass("fa-plus-square");
+      $("i.fa", this).addClass("fa-minus-square");
+      $(this).attr('aria-expanded', 'true');
+      return false;
+    }, function() {
+      var t = $(this).attr("href");
+      $(t).slideToggle("fast");
+      $("i.fa", this).removeClass("fa-minus-square");
+      $("i.fa", this).addClass("fa-plus-square");
+      $(this).attr('aria-expanded', 'false');
+      return false;
+    });
+    $("a.tooltip-expand-title").click(function(){
+      var t = $(this).attr("href");
+      $(t).fadeIn();
+      $("i.fa", this).removeClass("fa-plus-square");
+      $("i.fa", this).addClass("fa-minus-square");
+      $(this).attr('aria-expanded', 'true');
+      return false;
+    });
+    $("a.close-tip").click(function(){
+      var t = $(this).attr("href");
+      var r = $(this).attr("rel");
+      $(t).fadeOut();
+      $("." + r + " i.fa").removeClass("fa-minus-square");
+      $("." + r + " i.fa").addClass("fa-plus-square");
+      $("." + r).attr('aria-expanded', 'false');
+      return false;
+    });
+    // Countup
+    $('.counter').counterUp({
+      delay: 10,
+      time: 2000,
+    });
+  });
+})( jQuery );
+
+
+function cu_shortcodes_achors_js(selector) {
+  var count = 0;
+  var anchorText = '';
+  jQuery(selector).each(function(){
+		count++;
+		var thisText = jQuery(this).text();
+		thisText = jQuery.trim(thisText);
+		var anchorTextURL = thisText.replace(/ /g, "-");
+		var anchorLink = '<a name="' + anchorTextURL + '" id="' + anchorTextURL + '"></a>';
+		anchorText += '<li><i class="fa fa-arrow-down arrow"></i> <a href="#' + anchorTextURL + '">' + thisText + '</a></li>';
+		jQuery(this).before(anchorLink);
+	});
+	anchorText = '<div class="auto-anchor"><ul>' + anchorText + '</ul><div>';
+  if (count > 0) {
+    jQuery(".anchors-links").html(anchorText);
+    jQuery(".anchors").fadeIn();
+  }
+
+  jQuery('.anchors a').click(function(){
+    var scrollTarget = jQuery(this).attr("href");
+    jQuery("html, body").animate({scrollTop: (jQuery(scrollTarget).offset().top)-100}, 300);
+    return false;
+  });
+}
+;
+/*!
+* jquery.counterup.js 1.0
+*
+* Copyright 2013, Benjamin Intal http://gambit.ph @bfintal
+* Released under the GPL v2 License
+*
+* Date: Nov 26, 2013
+*/
+(function(e) {
+    "use strict";
+    e.fn.counterUp = function(t) {
+        var n = e.extend({
+            time: 400,
+            delay: 10
+        }, t);
+        return this.each(function() {
+            var t = e(this),
+                r = n,
+                i = function() {
+                    var e = [],
+                        n = r.time / r.delay,
+                        i = t.text(),
+                        s = /[0-9]+,[0-9]+/.test(i);
+                    i = i.replace(/,/g, "");
+                    var o = /^[0-9]+$/.test(i),
+                        u = /^[0-9]+\.[0-9]+$/.test(i),
+                        a = u ? (i.split(".")[1] || []).length : 0;
+                    for (var f = n; f >= 1; f--) {
+                        var l = parseInt(i / n * f);
+                        u && (l = parseFloat(i / n * f).toFixed(a));
+                        if (s)
+                            while (/(\d+)(\d{3})/.test(l.toString()))
+                                l = l.toString().replace(/(\d+)(\d{3})/, "$1,$2");
+                        e.unshift(l)
+                    }
+                    t.data("counterup-nums", e);
+                    t.text("0");
+                    var c = function() {
+                        t.text(t.data("counterup-nums").shift());
+                        if (t.data("counterup-nums").length)
+                            setTimeout(t.data("counterup-func"), r.delay);
+                        else {
+                            delete t.data("counterup-nums");
+                            t.data("counterup-nums", null);
+                            t.data("counterup-func", null)
+                        }
+                    };
+                    t.data("counterup-func", c);
+                    setTimeout(t.data("counterup-func"), r.delay)
+                };
+            t.waypoint(i, {
+                offset: "100%",
+                triggerOnce: !0
+            })
+        })
+    }
+})(jQuery);
+;
+(function ($) {
+
+Drupal.googleanalytics = {};
+
+$(document).ready(function() {
+
+  // Attach mousedown, keyup, touchstart events to document only and catch
+  // clicks on all elements.
+  $(document.body).bind("mousedown keyup touchstart", function(event) {
+
+    // Catch the closest surrounding link of a clicked element.
+    $(event.target).closest("a,area").each(function() {
+
+      // Is the clicked URL internal?
+      if (Drupal.googleanalytics.isInternal(this.href)) {
+        // Skip 'click' tracking, if custom tracking events are bound.
+        if ($(this).is('.colorbox') && (Drupal.settings.googleanalytics.trackColorbox)) {
+          // Do nothing here. The custom event will handle all tracking.
+          //console.info("Click on .colorbox item has been detected.");
+        }
+        // Is download tracking activated and the file extension configured for download tracking?
+        else if (Drupal.settings.googleanalytics.trackDownload && Drupal.googleanalytics.isDownload(this.href)) {
+          // Download link clicked.
+          ga("send", {
+            "hitType": "event",
+            "eventCategory": "Downloads",
+            "eventAction": Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase(),
+            "eventLabel": Drupal.googleanalytics.getPageUrl(this.href),
+            "transport": "beacon"
+          });
+        }
+        else if (Drupal.googleanalytics.isInternalSpecial(this.href)) {
+          // Keep the internal URL for Google Analytics website overlay intact.
+          ga("send", {
+            "hitType": "pageview",
+            "page": Drupal.googleanalytics.getPageUrl(this.href),
+            "transport": "beacon"
+          });
+        }
+      }
+      else {
+        if (Drupal.settings.googleanalytics.trackMailto && $(this).is("a[href^='mailto:'],area[href^='mailto:']")) {
+          // Mailto link clicked.
+          ga("send", {
+            "hitType": "event",
+            "eventCategory": "Mails",
+            "eventAction": "Click",
+            "eventLabel": this.href.substring(7),
+            "transport": "beacon"
+          });
+        }
+        else if (Drupal.settings.googleanalytics.trackOutbound && this.href.match(/^\w+:\/\//i)) {
+          if (Drupal.settings.googleanalytics.trackDomainMode !== 2 || (Drupal.settings.googleanalytics.trackDomainMode === 2 && !Drupal.googleanalytics.isCrossDomain(this.hostname, Drupal.settings.googleanalytics.trackCrossDomains))) {
+            // External link clicked / No top-level cross domain clicked.
+            ga("send", {
+              "hitType": "event",
+              "eventCategory": "Outbound links",
+              "eventAction": "Click",
+              "eventLabel": this.href,
+              "transport": "beacon"
+            });
+          }
+        }
+      }
+    });
+  });
+
+  // Track hash changes as unique pageviews, if this option has been enabled.
+  if (Drupal.settings.googleanalytics.trackUrlFragments) {
+    window.onhashchange = function() {
+      ga("send", {
+        "hitType": "pageview",
+        "page": location.pathname + location.search + location.hash
+      });
+    };
+  }
+
+  // Colorbox: This event triggers when the transition has completed and the
+  // newly loaded content has been revealed.
+  if (Drupal.settings.googleanalytics.trackColorbox) {
+    $(document).bind("cbox_complete", function () {
+      var href = $.colorbox.element().attr("href");
+      if (href) {
+        ga("send", {
+          "hitType": "pageview",
+          "page": Drupal.googleanalytics.getPageUrl(href)
+        });
+      }
+    });
+  }
+
+});
+
+/**
+ * Check whether the hostname is part of the cross domains or not.
+ *
+ * @param string hostname
+ *   The hostname of the clicked URL.
+ * @param array crossDomains
+ *   All cross domain hostnames as JS array.
+ *
+ * @return boolean
+ */
+Drupal.googleanalytics.isCrossDomain = function (hostname, crossDomains) {
+  /**
+   * jQuery < 1.6.3 bug: $.inArray crushes IE6 and Chrome if second argument is
+   * `null` or `undefined`, https://bugs.jquery.com/ticket/10076,
+   * https://github.com/jquery/jquery/commit/a839af034db2bd934e4d4fa6758a3fed8de74174
+   *
+   * @todo: Remove/Refactor in D8
+   */
+  if (!crossDomains) {
+    return false;
+  }
+  else {
+    return $.inArray(hostname, crossDomains) > -1 ? true : false;
+  }
+};
+
+/**
+ * Check whether this is a download URL or not.
+ *
+ * @param string url
+ *   The web url to check.
+ *
+ * @return boolean
+ */
+Drupal.googleanalytics.isDownload = function (url) {
+  var isDownload = new RegExp("\\.(" + Drupal.settings.googleanalytics.trackDownloadExtensions + ")([\?#].*)?$", "i");
+  return isDownload.test(url);
+};
+
+/**
+ * Check whether this is an absolute internal URL or not.
+ *
+ * @param string url
+ *   The web url to check.
+ *
+ * @return boolean
+ */
+Drupal.googleanalytics.isInternal = function (url) {
+  var isInternal = new RegExp("^(https?):\/\/" + window.location.host, "i");
+  return isInternal.test(url);
+};
+
+/**
+ * Check whether this is a special URL or not.
+ *
+ * URL types:
+ *  - gotwo.module /go/* links.
+ *
+ * @param string url
+ *   The web url to check.
+ *
+ * @return boolean
+ */
+Drupal.googleanalytics.isInternalSpecial = function (url) {
+  var isInternalSpecial = new RegExp("(\/go\/.*)$", "i");
+  return isInternalSpecial.test(url);
+};
+
+/**
+ * Extract the relative internal URL from an absolute internal URL.
+ *
+ * Examples:
+ * - https://mydomain.com/node/1 -> /node/1
+ * - https://example.com/foo/bar -> https://example.com/foo/bar
+ *
+ * @param string url
+ *   The web url to check.
+ *
+ * @return string
+ *   Internal website URL
+ */
+Drupal.googleanalytics.getPageUrl = function (url) {
+  var extractInternalUrl = new RegExp("^(https?):\/\/" + window.location.host, "i");
+  return url.replace(extractInternalUrl, '');
+};
+
+/**
+ * Extract the download file extension from the URL.
+ *
+ * @param string url
+ *   The web url to check.
+ *
+ * @return string
+ *   The file extension of the passed url. e.g. "zip", "txt"
+ */
+Drupal.googleanalytics.getDownloadExtension = function (url) {
+  var extractDownloadextension = new RegExp("\\.(" + Drupal.settings.googleanalytics.trackDownloadExtensions + ")([\?#].*)?$", "i");
+  var extension = extractDownloadextension.exec(url);
+  return (extension === null) ? '' : extension[1];
+};
+
+})(jQuery);
+;

@@ -1,0 +1,174 @@
+         <div className="container-fluid">
+	<div className="row">
+		<div className="col-md-12">
+			<div className="jumbotron card card-block">
+				<h2>
+					Hello, world!
+				</h2>
+				<p>
+					This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.
+				</p>
+				<p>
+					<a className="btn btn-primary btn-large" href="#">Learn more</a>
+				</p>
+			</div>
+			<div className="row">
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div className="container-fluid">
+	<div className="row">
+		<div className="col-md-12">
+			<div className="jumbotron card card-block">
+				<h2>
+					Hello, world!
+				</h2>
+				<p>
+					This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.
+				</p>
+				<p>
+					<a className="btn btn-primary btn-large" href="#">Learn more</a>
+				</p>
+			</div>
+			<div className="row">
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+				<div className="col-md-3">
+					<h2>
+						Heading
+					</h2>
+					<p>
+						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+					</p>
+					<p>
+						<a className="btn" href="#">View details »</a>
+					</p> 
+					<button type="button" className="btn btn-success">
+						Button
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div
+
+
+
+
+
+
+  <div className="jumbotron">
+                <h1 className="display-4">Welcome to the Boulder Bike Tour!</h1>
+                <p className="lead">
+                Once every decade, an exciting, prestigious, and inspiring bike race takes place in Colorado at the foot of the Rocky Mountains.                  
+                </p>
+                    <hr className="my-4"/>
+                        <p>It's the Boulder Bike Tour, and it's coming up in 2020!</p>
+                        <p>The huge hype around the event means it's time to start preparing the whole event now.</p>
+                        <p> The organizers need a website for the event and have launched a call for proposals, meaning you will be submitting your idea for the bike tour's site!</p>                              
+                               <Link className="btn btn-primary btn-lg" to='/contest'>Contest</Link>
+                               <Link className="btn btn-primary btn-lg" to='/location'>Location</Link>
+                               <Link className="btn btn-primary btn-lg" to='/photos'>Photos</Link>
+                               <Link className="btn btn-primary btn-lg" to='/riders'>Riders</Link>
+            </div>
+>
