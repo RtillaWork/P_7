@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import moment from 'moment'
 // import './counter_overlay.css';
 import './ContestCounter.css';

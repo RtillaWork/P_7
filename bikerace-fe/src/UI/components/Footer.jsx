@@ -1,6 +1,4 @@
-import React, { Component } from 'react'
-
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import React, {Component} from 'react'
 
 export default class Footer extends Component {
     render() {

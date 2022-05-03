@@ -1,4 +1,13 @@
-# p7js
+# Create a website for a prestigious bike race
+
+Allow people to track riders, see Flickr photos from the event, 
+and more via a site back-end, front-end, and external APIs!
+
+### Skills acquired in this project
+Use an external API in JavaScript
+Write tests that assess the functionality of a program
+Develop a website for a client
+Design a database schema
 
 openClassrooms | Project 7 | Bike Race
 Colorado at the foot of the Rocky Mountains.  It's the Boulder Bike Tour it's

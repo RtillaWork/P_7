@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ContestCounter from './ContestCounter';
 import EventInformation from './EventInformation';
 import Hero from './Hero';

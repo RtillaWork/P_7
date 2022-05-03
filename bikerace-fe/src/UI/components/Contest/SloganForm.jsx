@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import axiosInstance from '../../Utils/axiosInstance';
 
 export default class SloganForm extends Component {
