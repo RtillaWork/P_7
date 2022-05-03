@@ -9,12 +9,6 @@ class ContestController < ApplicationController
   end
 
   def create
-    # render plain: slogan_submission_params.inspect
-    # render plain: Event.first.inspect
-
-    # @slogan_submission = SloganSubmission.new slogan_submission_params
-
-    # @slogan_submission = SloganSubmission.create(slogan_submission_params)
     @slogan_submission = Event.first.slogan_submissions.create(slogan_submission_params)
 
     # {"firstName":"myfirstname", "lastName":"myLASTNAME","email":"MYEMAIL@EMAIL.COM", "slogan":"HELLO SLOGAN"}
@@ -31,7 +25,6 @@ class ContestController < ApplicationController
   def slogan_submission_params
     # {\"slogan_submission\":{\"firstName\":\"myfirstname\", \"lastName\":\"myLASTNAME\",\"email\":\"MYEMAIL@EMAIL.COM\", \"slogan\":\"HELLO SLOGAN\"}}
     # curl -d {"firstName":"myfirstname", "lastName":"myLASTNAME","email":"MYEMAIL@EMAIL.COM", "slogan":"HELLO SLOGAN"} -H "Content-Type: application/json" -X POST http://localhost:3001/contest
-    # params[:slogan_submission]
     params.require(:slogan_submission).permit(:firstName, :lastName, :email, :slogan)
   end
 
