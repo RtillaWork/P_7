@@ -7,23 +7,23 @@ import Hero from './Hero';
 
 export default class Home extends Component {
     render() {
-        return (            
+        return (
             <React.Fragment>
                 <div className='row align-items-stretch mt-1'>
                     <div className='col-md-6 align-self-stretch'>
-                        <Hero />
+                        <Hero/>
                     </div>
                     <div className='col-md-6'>
-                        <ContestCounter />
-                    </div>
-                </div> 
-                
-                <div className='row align-items-end mt-4'>
-                    <div className='col-md-12'>
-                        <EventInformation />
+                        <ContestCounter/>
                     </div>
                 </div>
-            </React.Fragment>           
+
+                <div className='row align-items-end mt-4'>
+                    <div className='col-md-12'>
+                        <EventInformation/>
+                    </div>
+                </div>
+            </React.Fragment>
         )
     }
 }

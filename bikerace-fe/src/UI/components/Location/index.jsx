@@ -21,49 +21,49 @@ export default class Location extends Component {
         this.setMarkers = this.setMarkers.bind(this);
 
         this.state = {
-            locations: [],            
-                    };        
+            locations: [],
+        };
 
     }
 
-   
-componentDidMount() {
-    const ridersMap = L.map('leaflet-map').setView([40.02, -105.26], 12);
+
+    componentDidMount() {
+        const ridersMap = L.map('leaflet-map').setView([40.02, -105.26], 12);
 
 
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    maxZoom: 12,
-    id: 'mapbox.streets',
-    accessToken: 'pk.eyJ1Ijoibm9yYW5hc3N5IiwiYSI6ImNqenRndW1uZjA1OWwzZHBjcDhjdjlhMXcifQ.6cM8H-861lH6ubZeFaIDUw'
-}).addTo(ridersMap);
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 12,
+            id: 'mapbox.streets',
+            accessToken: 'pk.eyJ1Ijoibm9yYW5hc3N5IiwiYSI6ImNqenRndW1uZjA1OWwzZHBjcDhjdjlhMXcifQ.6cM8H-861lH6ubZeFaIDUw'
+        }).addTo(ridersMap);
 
-    const API_URL = `${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
+        const API_URL = `${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
 
-    const axiosInstance = axios.create({
-        baseURL: API_URL,
-        headers: {'Content-Type': 'application/json'}
-      });
+        const axiosInstance = axios.create({
+            baseURL: API_URL,
+            headers: {'Content-Type': 'application/json'}
+        });
 
-    axiosInstance.get('/locations')
-      .then(res => {
-       this.setState({locations: res.data });
-      }).then(() => {
-        this.setMarkers(ridersMap);
-    })
-     .catch(err => console.error(err));
+        axiosInstance.get('/locations')
+            .then(res => {
+                this.setState({locations: res.data});
+            }).then(() => {
+            this.setMarkers(ridersMap);
+        })
+            .catch(err => console.error(err));
 
-}
+    }
 
 
-    setMarkers(amap) {               
-       let markers = Array(this.state.locations.length);
+    setMarkers(amap) {
+        let markers = Array(this.state.locations.length);
 
         this.state.locations.forEach(location => {
-            markers[location.riderID] = L.marker( [location.latitude, location.longitude])
-            .addTo(amap)
-            .bindPopup(`${location.riderID}: ${location.lastName}`)
-            .openPopup(); 
+            markers[location.riderID] = L.marker([location.latitude, location.longitude])
+                .addTo(amap)
+                .bindPopup(`${location.riderID}: ${location.lastName}`)
+                .openPopup();
         });
 
 
@@ -82,11 +82,11 @@ componentDidMount() {
                         Click on a marker to display the name of the contestant.
                     </p>
                 </div>
- 
-            <div className='bg-secondary' id='leaflet-map' style={{height: '640px'}}></div>
+
+                <div className='bg-secondary' id='leaflet-map' style={{height: '640px'}}></div>
             </div>
- 
-   
+
+
         );
     }
 }

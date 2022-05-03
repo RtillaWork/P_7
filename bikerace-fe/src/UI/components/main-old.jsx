@@ -17,17 +17,17 @@ export default class Main extends Component {
     render() {
         return (
             <main className='container'>  {/* flex-grow-1*/}
-            {/* <Switch> */}
-                <Route exact path='/' component={Home} />
-                <Route path='/contest' component={Contest} />
-                <Route path='/location' component={Location} />
-                <Route path='/photos' component={Photos} />
-                <Route 
-                    path='/riders' 
-                    render={props => <Riders {...props} data={this.props.data} />} 
+                {/* <Switch> */}
+                <Route exact path='/' component={Home}/>
+                <Route path='/contest' component={Contest}/>
+                <Route path='/location' component={Location}/>
+                <Route path='/photos' component={Photos}/>
+                <Route
+                    path='/riders'
+                    render={props => <Riders {...props} data={this.props.data}/>}
                 />
-            {/* </Switch> */}
-            </main>            
+                {/* </Switch> */}
+            </main>
         )
     }
 }

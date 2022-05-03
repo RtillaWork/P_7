@@ -19,8 +19,8 @@ class EventControllerTest < ActionDispatch::IntegrationTest
   # test "Event number of participatns is = to 20" do
   #   assert_equalt @event.numberOfParticipants, 20
   # end 
-  
-   test "should get event" do
+
+  test "should get event" do
     get root_url
     assert_response :success
   end

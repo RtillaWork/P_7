@@ -5,20 +5,20 @@ import Hero from './Hero';
 
 export default class Home extends Component {
     render() {
-        return (  
+        return (
             <React.Fragment>
                 <div className='d-flex flex-column align-content-between  align-items-stretch mb-5'>
                     <div className='d-flex flex-row align-content-between align-items-stretch mb-5'>
                         <div className='d-flex flex-column align-content-between  align-items-start w-50 mr-1'>
-                            <Hero />
+                            <Hero/>
                         </div>
                         <div className='w-50 ml-1'>
-                            <ContestCounter />
+                            <ContestCounter/>
                         </div>
-                    </div>                
-                  <EventInformation />                                    
+                    </div>
+                    <EventInformation/>
                 </div>
-            </React.Fragment>           
+            </React.Fragment>
         )
     }
 }

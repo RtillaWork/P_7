@@ -1,6 +1,5 @@
 # json.partial! "slogan_submissions/slogan_submission", slogan_submission: @slogan_submission
 
-
 # json.content format_content(@message.content)
 # json.(@message, :created_at, :updated_at)
 

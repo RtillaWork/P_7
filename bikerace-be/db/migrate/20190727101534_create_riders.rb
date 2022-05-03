@@ -6,7 +6,7 @@ class CreateRiders < ActiveRecord::Migration[5.2]
       t.string :cityOfOrigin, null: false
       t.string :stateOfOrigin, null: false
       t.float :latitude, null: false
-      t.float :longitude, null: false      
+      t.float :longitude, null: false
       t.references :event, foreign_key: true
 
       t.timestamps

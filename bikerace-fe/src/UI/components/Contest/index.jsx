@@ -6,8 +6,8 @@ export default class Contest extends Component {
     render() {
         return (
             <div>
-                <ContestInfo />
-                <SloganForm />
+                <ContestInfo/>
+                <SloganForm/>
             </div>
         );
     }
